@@ -83,7 +83,7 @@ export function Architecture() {
               <tr><th scope="row">Phase 1B: idle CPU</th><td><Tag o="mod" /></td><td>New idle-policy header; the five polling loops call it.</td></tr>
               <tr><th scope="row">Phase 2: cash and risk</th><td><Tag o="mod" /></td><td>Buying-power checks, cold-start market orders, journal capacity and graceful stop; new risk tests.</td></tr>
               <tr><th scope="row">Phase 3: research package</th><td><Tag o="mine" /></td><td>Data validation, backtester, walk-forward ML, accounting audit, final-test ledger.</td></tr>
-              <tr><th scope="row">Phase 4: signal bridge and this site</th><td><Tag o="mine" /></td><td>Loopback-only bridge with limits; static website (built with AI assistance).</td></tr>
+              <tr><th scope="row">Phase 4: signal bridge and this site</th><td><Tag o="mine" /></td><td>Loopback-only bridge with limits; static website.</td></tr>
             </tbody></table>
         </div>
       </section>

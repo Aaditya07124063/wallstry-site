@@ -11,7 +11,7 @@ const AREAS: { t: string; o: "up" | "mod" | "mine"; p: string; e: string; to: st
   { t: "C++ exchange", o: "mod", p: "A six-thread paper-trading exchange (gateway, risk, sequencer and journal, matching engine, publisher, history) written by someone else. I ported it to macOS on Apple Silicon, fixed a login stall, cut idle CPU, and added cash and risk checks.", e: "Existing C++ suite passes in both idle modes, 20 of 20 runs each, plus new regression and risk tests.", to: "engineering", cta: "Read the engineering record" },
   { t: "Research lab", o: "mine", p: "Python package: hashed daily-bar snapshot, deterministic backtester, purged walk-forward evaluation, final-test ledger, and an independent accounting audit. It imports nothing from the exchange.", e: "50 tests. Buy-and-hold, momentum, a majority rule, logistic regression and XGBoost compared on one protocol.", to: "research", cta: "See the research" },
   { t: "Signal bridge", o: "mine", p: "Turns target weights into paper orders on a local exchange: long-only, allow-listed symbols, per-order, per-stock and total limits, immediate-or-cancel limit orders within a 1% collar, loopback only, dry run by default.", e: "Tested against a real local exchange, 25 consecutive passes after fixing a wrong test assumption.", to: "architecture", cta: "See how it connects" },
-  { t: "This website", o: "mine", p: "A static React and TypeScript site. Its Trading page is a browser simulator with a candlestick chart, order ladder, ticket, risk checks, order lifecycle and a blotter. It is not connected to the C++ engine.", e: "Unit, end-to-end and automated accessibility tests. Built with AI assistance.", to: "demo", cta: "Open the trading workspace" },
+  { t: "This website", o: "mine", p: "A static React and TypeScript site. Its Trading page is a browser simulator with a candlestick chart, order ladder, ticket, risk checks, order lifecycle and a blotter. It is not connected to the C++ engine.", e: "Unit, end-to-end and automated accessibility tests.", to: "demo", cta: "Open the trading workspace" },
 ];
 
 export function Landing({ go }: { go: (p: string) => void }) {
@@ -20,7 +20,7 @@ export function Landing({ go }: { go: (p: string) => void }) {
       <section className="card ov-head">
         <p className="eyebrow">Engineering portfolio · case study</p>
         <h1>Hardening a C++ exchange, and testing whether ML can trade</h1>
-        <p className="lead">I extended an existing paper-trading exchange written by someone else, built a Python research lab and a safety-limited signal bridge around it, and reported an honest negative result. Each part is labelled by who wrote it.</p>
+        <p className="lead">I extended an existing paper-trading exchange written by someone else, built a Python research lab and a safety-limited signal bridge around it, and reported a negative result. Each part is labelled by who wrote it.</p>
         <ol className="story" aria-label="The project in three steps">
           <li><span className="n" aria-hidden="true">1</span><b>Inherited</b><span>A six-thread C++ paper-trading exchange, written by someone else.</span></li>
           <li><span className="n" aria-hidden="true">2</span><b>Hardened</b><span>Fixed a login stall, cut idle CPU, added cash and risk checks. Each change measured before and after.</span></li>
@@ -61,7 +61,7 @@ export function Landing({ go }: { go: (p: string) => void }) {
             <tr><th scope="row">C++ exchange</th><td>Matching engine, gateway, accounts, terminal UI, Python client</td><td>Login-lock fix, adaptive idle CPU mode, cash and risk checks, journal-full handling, macOS Apple Silicon port, tests</td></tr>
             <tr><th scope="row">Research</th><td>Nothing</td><td>Data validation, backtester, walk-forward ML, accounting audit, final-test ledger</td></tr>
             <tr><th scope="row">Bridge</th><td>Uses its Python client</td><td>Loopback-only signal-to-order program with limits and dry-run default</td></tr>
-            <tr><th scope="row">This website</th><td>Nothing</td><td>All code and text, written independently (built with AI assistance)</td></tr>
+            <tr><th scope="row">This website</th><td>Nothing</td><td>All code and text, none taken from the upstream project</td></tr>
           </tbody>
         </table></div>
       </section>
@@ -127,7 +127,7 @@ export function About() {
         <p className="small">This is a factual summary, not legal advice.</p>
       </section>
       <section className="card callout-card"><h2>Attribution</h2>
-        <p>The Wallstry C++ exchange, terminal app, Python client and original documents were written by whynotramaa (github.com/whynotramaa/wallstry, commit 0283b4c), who has not published a licence. I have not published their source code and will not until the author grants permission. My work is the patches, tests, research package, bridge and this site. This site is not affiliated with the original author. See <a href="/THIRD_PARTY_NOTICES.txt">third-party notices</a>.</p>
+        <p>The Wallstry C++ exchange, terminal app, Python client and original documents were written by whynotramaa (github.com/whynotramaa/wallstry, commit 0283b4c), who has not published a licence. I have not published their source code and will not until the author grants permission. The patches, tests, research package, signal bridge and this website are the work of Aaditya Adhikari. The browser trading simulator on this site is a separate, independently written synthetic simulation; it does not contain or run the original C++ engine. The website was built with AI assistance. This site is not affiliated with the original author. See <a href="/THIRD_PARTY_NOTICES.txt">third-party notices</a>.</p>
       </section>
     </div>
   );

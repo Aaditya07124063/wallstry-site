@@ -18,7 +18,7 @@ function Withheld() {
       <section className="card lead-card">
         <p className="eyebrow">Research lab · protocol and conclusion</p>
         <h2>Can a model predict the next move, and does acting on it beat simple rules?</h2>
-        <p>Five strategies were compared on one protocol designed to catch self-deception. The honest answer is negative; see the conclusion.</p>
+        <p>Five strategies were compared on one protocol designed to catch self-deception. The result is negative; see the conclusion.</p>
         <div className="banner" role="note"><strong>Figures withheld.</strong> Backtest and classification metrics were derived from Yahoo Finance data. They stay private until the provider’s terms have been reviewed. The method and the conclusion are below.</div>
       </section>
 

@@ -1,4 +1,4 @@
-# Wallstry case study site: build and Cloudflare Pages preparation (NOT deployed)
+# Wallstry case study site: build and Cloudflare Pages preparation (deployed at https://wallstry-site.pages.dev/)
 
 ## Local
 ```bash
@@ -10,7 +10,7 @@ npm run check:bundle   # fails on secrets, private paths, source maps, raw-data 
 npm run preview        # serve dist/ at http://localhost:4173
 ```
 
-## Cloudflare Pages settings (when you decide to deploy)
+## Cloudflare Pages settings
 | Setting | Value |
 |---|---|
 | Root directory | `/` (repository root) |
@@ -19,7 +19,7 @@ npm run preview        # serve dist/ at http://localhost:4173
 | `NODE_VERSION` | `22` or newer (tested on Node 22 and 26) |
 | Environment variables | none required |
 
-`public/_headers` ships a strict CSP and security headers (untested on Cloudflare itself). Routing is hash-based, so no `_redirects` file is needed.
+`public/_headers` ships a strict CSP and security headers (confirmed served by Cloudflare Pages on 2026-10-29). Routing is hash-based, so no `_redirects` file is needed.
 
 ## Backend hosting design (separate from Pages; not built)
 Cloudflare Pages serves static files only and cannot run the persistent native C++ exchange.
