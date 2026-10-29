@@ -29,5 +29,10 @@ Cloudflare Pages serves static files only and cannot run the persistent native C
 4. Until then the site's demo is the in-browser simulation plus its generated sample run, both labelled as such.
 
 ## Publication blockers
-- The original Wallstry code has no licence and no identified author. It is not in this repository or the bundle.
+- The original Wallstry code (github.com/whynotramaa/wallstry @ 0283b4c) has no licence file or copyright notice. It is not in this repository or the bundle.
 - No vendor data is redistributed: the Research page is summary prose, and price charts are synthetic.
+
+## Research metrics are local-only (release gate)
+`src/research-data.local.ts` and `src/Research.local.tsx` are gitignored. A clean checkout builds the "figures withheld" Research page.
+`npm run check:bundle` fails if derived metrics are in `dist/` (override for local preview only: `ALLOW_RESEARCH_METRICS=1`).
+End-to-end tests: `npm run e2e` (needs Google Chrome).

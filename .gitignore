@@ -14,3 +14,14 @@ credentials*
 *.swp
 .DS_Store
 .claude
+test-results
+playwright-report
+shots
+
+# derived research metrics: local only until data-provider terms are cleared
+src/research-data.local.ts
+src/Research.local.tsx
+private-research.html
+src/private-research.local.tsx
+src/*.local.test.tsx
+e2e-private

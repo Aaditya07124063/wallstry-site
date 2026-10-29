@@ -3,7 +3,7 @@
 Static React + TypeScript site that presents an independent engineering and research write-up built around the open-source-style "Wallstry" paper-trading exchange.
 
 ## Credit and scope
-- The Wallstry C++ exchange, terminal app, Python client and original documents were written by an original author who is not identified in the copy the site author received. That copy has no licence, so none of it is in this repository. This site is not affiliated with that author.
+- The Wallstry C++ exchange, terminal app, Python client and original documents were written by GitHub user [whynotramaa](https://github.com/whynotramaa/wallstry) (verified against commit `0283b4c51617dd423edf950064636275cfd3aece`, "finalized:)"). That repository has no licence file or copyright notice, so none of it is in this repository. This site is not affiliated with that author.
 - The site author's own work, described on the site: bug fixes, risk controls and tests for the exchange, a separate Python research lab, a signal bridge that turns model signals into risk-checked paper orders, and this website.
 
 ## Licence

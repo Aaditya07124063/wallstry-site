@@ -43,3 +43,34 @@ test("equity marks positions and cash adds up", () => {
   const spent = r.acct.fills.reduce((s, f) => s + f.qty * f.price, 0);
   expect(equity(r.acct, marks)).toBeCloseTo(LIMITS.startCash - spent + 10 * marks.AAPL, 6);
 });
+
+import { buyingPower, candles, holdings, place } from "./sim";
+
+test("candles are deterministic, consistent with closes, and internally valid", () => {
+  const cs = candles("TSLA");
+  expect(cs).toEqual(candles("TSLA"));
+  expect(cs.map((c) => c.c)).toEqual(series("TSLA"));
+  for (const c of cs) { expect(c.h).toBeGreaterThanOrEqual(Math.max(c.o, c.c)); expect(c.l).toBeLessThanOrEqual(Math.min(c.o, c.c)); expect(c.v).toBeGreaterThan(0); }
+});
+
+test("place() classifies filled, partial, cancelled and rejected orders", () => {
+  const a = newAccount();
+  expect(place(a, { side: "buy", sym: "AAPL", qty: 5, type: "market" }, b, 100, marks, 1).rec.status).toBe("Filled");
+  expect(place(a, { side: "buy", sym: "AAPL", qty: 5, type: "limit", limit: b.bids[0].price - 1 }, b, 100, marks, 2).rec.status).toBe("Cancelled");
+  expect(place(a, { side: "sell", sym: "AAPL", qty: 5, type: "market" }, b, 100, marks, 3).rec.status).toBe("Rejected");
+  const thin = { ...b, asks: [{ price: b.asks[0].price, qty: 3 }, ...b.asks.slice(1, 1)] };
+  const p = place(a, { side: "buy", sym: "AAPL", qty: 5, type: "market" }, thin, 100, marks, 4).rec;
+  expect([p.status, p.filled]).toEqual(["Partially filled", 3]);
+});
+
+test("holdings track average cost and realized P&L; buying power respects exposure cap", () => {
+  let a = newAccount();
+  a = place(a, { side: "buy", sym: "AAPL", qty: 10, type: "market" }, b, 100, marks, 1).acct;
+  const bought = a.fills.reduce((s, f) => s + f.qty * f.price, 0);
+  expect(holdings(a).AAPL!.cost / 10).toBeCloseTo(bought / 10, 6);
+  const sold = place(a, { side: "sell", sym: "AAPL", qty: 10, type: "market" }, b, 100, marks, 2).acct;
+  const h = holdings(sold).AAPL!;
+  expect(h.qty).toBe(0);
+  expect(h.realized).toBeCloseTo(equity(sold, marks) - LIMITS.startCash, 6); // flat book: realized == total P&L
+  expect(buyingPower(newAccount(), marks)).toBe(LIMITS.startCash > LIMITS.maxGross ? LIMITS.maxGross : LIMITS.startCash);
+});

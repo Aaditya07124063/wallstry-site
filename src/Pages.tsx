@@ -1,25 +1,60 @@
-import { EVIDENCE } from "./evidence";
+import { Legend, Tag } from "./Architecture";
+
+const KPIS: { k: string; v: string; d: string; cls?: string }[] = [
+  { k: "Idle CPU, exchange", v: "495% → 20%", d: "Adaptive idle mode for five worker threads; busy mode kept for comparison.", cls: "good" },
+  { k: "Overspending buys let through", v: "56 → 2", d: "Of 200 pipelined $50,000 buys on $100,000 of cash. Exactly two can be afforded.", cls: "good" },
+  { k: "New-account login", v: "~1 s → < 0.5 s", d: "Regression test: 12 new users log in under trade load.", cls: "good" },
+  { k: "Predictive skill", v: "Not demonstrated", d: "Final test run once and locked by a ledger. Returns are reported separately.", cls: "bad" },
+];
+
+const AREAS: { t: string; o: "up" | "mod" | "mine"; p: string; e: string; to: string; cta: string }[] = [
+  { t: "C++ exchange", o: "mod", p: "A six-thread paper-trading exchange (gateway, risk, sequencer and journal, matching engine, publisher, history) written by someone else. I ported it to macOS on Apple Silicon, fixed a login stall, cut idle CPU, and added cash and risk checks.", e: "Existing C++ suite passes in both idle modes, 20 of 20 runs each, plus new regression and risk tests.", to: "engineering", cta: "Read the engineering record" },
+  { t: "Research lab", o: "mine", p: "Python package: hashed daily-bar snapshot, deterministic backtester, purged walk-forward evaluation, final-test ledger, and an independent accounting audit. It imports nothing from the exchange.", e: "50 tests. Buy-and-hold, momentum, a majority rule, logistic regression and XGBoost compared on one protocol.", to: "research", cta: "See the research" },
+  { t: "Signal bridge", o: "mine", p: "Turns target weights into paper orders on a local exchange: long-only, allow-listed symbols, per-order, per-stock and total limits, immediate-or-cancel limit orders within a 1% collar, loopback only, dry run by default.", e: "Tested against a real local exchange, 25 consecutive passes after fixing a wrong test assumption.", to: "architecture", cta: "See how it connects" },
+  { t: "This website", o: "mine", p: "A static React and TypeScript site. Its Trading page is a browser simulator with a candlestick chart, order ladder, ticket, risk checks, order lifecycle and a blotter. It is not connected to the C++ engine.", e: "Unit, end-to-end and automated accessibility tests. Built with AI assistance.", to: "demo", cta: "Open the trading workspace" },
+];
 
 export function Landing({ go }: { go: (p: string) => void }) {
   return (
-    <div className="stack">
-      <section className="hero">
-        <p className="eyebrow">Engineering case study</p>
-        <h1>I hardened an existing C++ paper-trading exchange and tested whether machine learning could beat simple strategies. It could not be shown to.</h1>
-        <p className="lead">The exchange (Wallstry) was written by someone else. My work is the bug fixes, risk controls and tests I added to it, a separate Python research lab, and a safe bridge that turns model signals into paper orders. This site is an independent write-up and contains none of the exchange's source code.</p>
+    <div className="stack ov">
+      <section className="card ov-head">
+        <p className="eyebrow">Engineering portfolio · case study</p>
+        <h1>Hardening a C++ exchange, and testing whether ML can trade</h1>
+        <p className="lead">I extended an existing paper-trading exchange written by someone else, built a Python research lab and a safety-limited signal bridge around it, and reported an honest negative result. Each part is labelled by who wrote it.</p>
+        <ol className="story" aria-label="The project in three steps">
+          <li><span className="n" aria-hidden="true">1</span><b>Inherited</b><span>A six-thread C++ paper-trading exchange, written by someone else.</span></li>
+          <li><span className="n" aria-hidden="true">2</span><b>Hardened</b><span>Fixed a login stall, cut idle CPU, added cash and risk checks. Each change measured before and after.</span></li>
+          <li><span className="n" aria-hidden="true">3</span><b>Tested</b><span>Built a research lab to ask whether ML can trade. The result was negative, and it is reported.</span></li>
+        </ol>
         <div className="row">
-          <button className="primary" onClick={() => go("demo")}>Try the demo</button>
-          <button onClick={() => go("research")}>See the research</button>
+          <button className="primary" onClick={() => go("engineering")}>Read the engineering record</button>
+          <button className="ghost" onClick={() => go("demo")}>Open trading workspace</button>
+          <button className="ghost" onClick={() => go("research")}>Research</button>
+          <button className="ghost" onClick={() => go("architecture")}>Architecture</button>
         </div>
-        <p className="small">Everything on this site is simulated or derived. No real money, no live market data, no investment advice.</p>
+        <Legend />
       </section>
-      <section className="cards3" aria-label="Project summary in three parts">
-        <article className="card"><h2>1. Exchange</h2><p>A matching engine pairs buyers and sellers by price and arrival order. I fixed a login lock-up, cut idle CPU use, and added cash and risk checks, including a bug where rapid-fire orders could overspend.</p></article>
-        <article className="card"><h2>2. Research</h2><p>Walk-forward tests with a strict "no peeking" rule, realistic costs, and a one-shot final exam locked by a ledger. Buy-and-hold, momentum, a majority guess, logistic regression and XGBoost compared fairly.</p></article>
-        <article className="card"><h2>3. Bridge</h2><p>A small Python program turns model signals into paper orders on a local exchange, behind hard limits. It refuses anything that is not on the same machine.</p></article>
+
+      <h2 className="sect">Measured outcomes</h2>
+      <section className="verdicts kpis" aria-label="Key measured outcomes">
+        {KPIS.map((x) => <div key={x.k} className={`verdict ${x.cls ?? ""}`}><small>{x.k}</small><b>{x.v}</b><span>{x.d}</span></div>)}
       </section>
-      <section className="card"><h2>Original project vs my contribution</h2>
-        <div className="scroll" tabIndex={0}><table className="txt">
+
+      <h2 className="sect">What I built, and who wrote what</h2>
+      <section className="grid-cards area-grid" aria-label="Project areas">
+        {AREAS.map((a, i) => (
+          <article key={a.t} className={i === 0 ? "card area feature" : "card area"}>
+            <h3>{a.t} <Tag o={a.o} /></h3>
+            <p>{a.p}</p>
+            <p className="ev"><strong>Evidence.</strong> {a.e}</p>
+            <a href={`#${a.to}`}>{a.cta} →</a>
+          </article>
+        ))}
+      </section>
+
+      <section className="card" aria-labelledby="h-who">
+        <h2 id="h-who">Original project vs my contribution</h2>
+        <div className="scroll" tabIndex={0} role="region" aria-label="Who wrote what (scrollable)"><table className="txt">
           <caption className="sr">Who wrote what</caption>
           <thead><tr><th scope="col">Part</th><th scope="col">Original Wallstry</th><th scope="col">Mine</th></tr></thead>
           <tbody>
@@ -30,105 +65,69 @@ export function Landing({ go }: { go: (p: string) => void }) {
           </tbody>
         </table></div>
       </section>
-      <section className="card"><h2>What a reader should take away in 30 seconds</h2>
-        <ul>
-          <li>The C++ exchange and its tests were extended without breaking the existing test suite.</li>
-          <li>The ML results are reported honestly: accuracy near a coin flip, so no skill claimed.</li>
-          <li>Returns and prediction quality are shown separately because they answer different questions.</li>
-          <li>The demo here is a labeled browser simulation, plus a scripted sample run generated by that same simulator.</li>
+
+      <section className="card scope" aria-labelledby="h-scope">
+        <h2 id="h-scope">What this site is not</h2>
+        <ul className="plain cols2">
+          <li><strong>Not live.</strong> Nothing here connects to a running exchange or a market. All prices are seeded random numbers.</li>
+          <li><strong>Not the C++ engine.</strong> The trading page runs a simplified TypeScript matcher in your browser.</li>
+          <li><strong>Not the original author’s code.</strong> It contains none of the exchange’s source, and is not affiliated with that author (whynotramaa).</li>
+          <li><strong>Not investment advice.</strong> Paper trading only; no real money.</li>
         </ul>
       </section>
     </div>
   );
 }
 
-export function Architecture() {
-  const box = (x: number, y: number, t: string, c = "") => (
-    <g key={t}><rect x={x} y={y} width="150" height="44" rx="6" className={`node ${c}`} /><text x={x + 75} y={y + 27} textAnchor="middle">{t}</text></g>
-  );
-  const arrow = (x1: number, y1: number, x2: number, y2: number) => <line key={`${x1}${y1}${x2}${y2}`} x1={x1} y1={y1} x2={x2} y2={y2} className="edge" markerEnd="url(#a)" />;
-  return (
-    <div className="stack">
-      <section className="card">
-        <h2>How the pieces fit</h2>
-        <div className="scroll" tabIndex={0}><svg viewBox="0 0 760 330" role="img" aria-label="Architecture. Yahoo-sourced data goes into the Python research lab, which writes target weights to the signal bridge. The bridge sends risk-checked orders by TCP to the C++ exchange on the same machine. The React site is static and talks to neither." className="arch">
-          <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" className="head" /></marker></defs>
-          {box(10, 20, "Frozen daily bars")}{box(10, 100, "Python research lab")}{box(10, 180, "Results (kept private)")}
-          {box(220, 100, "Signal bridge", "key")}{box(430, 100, "C++ exchange", "key")}{box(430, 190, "Simulated bots")}{box(430, 20, "Journal + SQLite")}
-          {box(600, 250, "React site (static)", "web")}
-          {arrow(85, 64, 85, 100)}{arrow(85, 144, 85, 180)}{arrow(160, 122, 220, 122)}{arrow(370, 122, 430, 122)}{arrow(505, 190, 505, 144)}{arrow(505, 100, 505, 64)}{arrow(160, 202, 600, 272)}
-          <text x="395" y="115" className="lbl" textAnchor="middle">TCP, loopback</text>
-        </svg></div>
-        <ul>
-          <li><strong>Research lab and exchange never import each other.</strong> Backtests replay history; the exchange is a live simulated market.</li>
-          <li><strong>Bridge</strong> validates the signal, applies per-order, per-stock and total limits, never shorts, uses immediate-or-cancel limit orders within a 1% price collar, and defaults to a dry run.</li>
-          <li><strong>The exchange is never exposed publicly.</strong> The bridge refuses non-loopback hosts. The website is static files and contains no exchange credentials.</li>
-          <li><strong>Inside the C++ exchange:</strong> gateway, risk checks, sequencer and journal, matching engine, publisher, history writer, each on its own thread connected by lock-free rings.</li>
-        </ul>
-      </section>
-      <section className="card"><h2>The C++ exchange in one minute</h2>
-        <p>Orders arrive over TCP, pass risk checks, get a sequence number and a journal entry, and are matched by price and then arrival time. Each stage runs on its own thread, linked by lock-free queues. Measured on the original author's laptop: about 28-31 million commands per second in the engine alone and a median acknowledgement near 10 microseconds over loopback. Those are different measurements and this site does not re-run them. My changes: idle workers used 407-495% CPU, now about 20% with an adaptive idle mode; new-account login no longer stalls behind a database lock; buy orders are checked against cash, counting orders still in flight. The exchange is a learning project, not production-ready: it has known gaps listed under Limits &amp; credit.</p>
-      </section>
-      <section className="card"><h2>Hosting plan (not deployed)</h2>
-        <p>Cloudflare Pages serves the static site. Cloudflare cannot run the persistent native C++ exchange, so a future live demo needs a separate small server (a VM or container) running the exchange on a private network, with a thin authenticated, rate-limited web API in front that Cloudflare reaches through a tunnel. Until then the demo is the in-browser simulation and its scripted sample run.</p>
-      </section>
-    </div>
-  );
-}
-
-export function Engineering() {
-  return (
-    <div className="stack">
-      <section className="card"><h2>Engineering improvements</h2>
-        <ul>
-          <li><strong>Login time-outs:</strong> found SQLite writer-lock contention during account creation and fixed it.</li>
-          <li><strong>Idle CPU:</strong> workers used 407-495% CPU doing nothing. Added an adaptive idle mode (default) with the original busy mode kept for comparison; latency checked before and after.</li>
-          <li><strong>Cash and risk:</strong> buying-power checks, cold-start market orders, journal exhaustion handled without crashing, and in-flight accounting that stops pipelined orders from overspending.</li>
-          <li><strong>Research:</strong> walk-forward ML with label purge, deterministic backtester, a final-test ledger, and an independent accounting audit of the backtester.</li>
-          <li><strong>Bridge:</strong> loopback-only, dry-run default, explicit limits, tested against a real local exchange.</li>
-        </ul>
-      </section>
-      <section className="card"><h2>Run it locally</h2>
-        <p>Needs the original Wallstry source (not included here) plus macOS or Linux, a C++23 compiler, SQLite and libsodium. From that checkout:</p>
-        <pre tabIndex={0}><code>{`make -j2 && make check      # build and run the C++ test groups
-make check-research          # Python research tests
-python3 -m pytest bridge     # signal bridge, incl. a local exchange
-./demo.sh --headless         # exchange + bots, then:
-python3 bridge/signal_bridge.py signal.json            # dry run
-python3 bridge/signal_bridge.py signal.json --execute  # paper orders
-cd web && npm ci && npm test && npm run build && npm run preview`}</code></pre>
-        <p className="small">This website alone needs only Node and npm: the last line.</p>
-      </section>
-      <section className="card"><h2>Verified test evidence</h2>
-        <table>
-          <caption className="sr">Test suites and recorded results</caption>
-          <thead><tr><th scope="col">Suite</th><th scope="col">Result</th><th scope="col">Command</th></tr></thead>
-          <tbody>{EVIDENCE.map((e) => <tr key={e.suite}><th scope="row">{e.suite}</th><td>{e.result}</td><td><code>{e.where}</code></td></tr>)}</tbody>
-        </table>
-        <p className="small">Results are copied from actual runs on the author's Apple Silicon Mac. Linux/x86 is untested.</p>
-      </section>
-    </div>
-  );
-}
+const LICENSES: [string, string, string][] = [
+  ["Original Wallstry: C++ exchange, terminal app, Python client, original docs", "No license found; by whynotramaa (github.com/whynotramaa/wallstry, commit 0283b4c). The repository has no licence file or copyright notice, so default copyright applies: all rights reserved.", "No. Not included in this site or repository, and will not be until the author grants permission."],
+  ["My patches and new files for the exchange", "Mine, but each patch quotes upstream context. Needs the author’s agreement before publishing.", "No. Described here only."],
+  ["Research package and signal bridge", "Mine.", "Described here; source not published yet."],
+  ["Price data (Yahoo Finance via yfinance)", "Provider terms restrict redistribution; not reviewed in depth.", "No prices, bars or per-day series. Only derived summary statistics."],
+  ["This website’s source", "MIT, covering the website source only.", "Yes."],
+  ["React and React DOM", "MIT (Meta Platforms).", "Bundled; see third-party notices."],
+  ["FTXUI", "MIT (Arthur Sonzogni), used by the terminal app.", "Not bundled."],
+];
 
 export function About() {
   return (
     <div className="stack">
-      <section className="card"><h2>Limitations</h2>
-        <ul>
-          <li><strong>No demonstrated predictive skill.</strong> AUC roughly 0.48-0.52 across the development and final periods; no significance test; no multiple-testing correction.</li>
-          <li><strong>Survivorship bias.</strong> The five stocks are today's mega-cap winners, which flatters buy-and-hold.</li>
-          <li><strong>One path, one vendor.</strong> Adjusted prices from a single provider; fills at the next open with fixed slippage; no market impact, taxes or cash yield.</li>
-          <li><strong>Charts on this site are synthetic.</strong> Real historical prices are not redistributed (provider terms), so the price charts are seeded random walks. The Research page shows aggregate findings only.</li>
-          <li><strong>Browser demo is not the C++ engine.</strong> It is a simplified matcher written in TypeScript.</li>
-          <li><strong>Known exchange gaps:</strong> no market-order price protection and sells are not collateral-checked (inherited, unchanged).</li>
-          <li><strong>Bridge orders can miss.</strong> Immediate-or-cancel orders at a 1% price limit failed to fill about 1 time in 4 against the simulated bots' thin book. That is normal behaviour, not a fault; the bridge now reports the cancelled orders.</li>
-          <li>Tested on macOS Apple Silicon only.</li>
-        </ul>
+      <section className="verdicts kpis" aria-label="Key limits at a glance">
+        <div className="verdict bad"><small>Research</small><b>No predictive edge demonstrated</b><span>Accuracy near a coin flip; no significance test run.</span></div>
+        <div className="verdict bad"><small>Upstream code</small><b>Not published</b><span>No licence found; not included here.</span></div>
+        <div className="verdict bad"><small>Trading page</small><b>Synthetic market simulation</b><span>Seeded random prices, not the C++ engine.</span></div>
+        <div className="verdict good"><small>This website</small><b>MIT</b><span>Website source only.</span></div>
       </section>
-      <section className="card"><h2>Attribution</h2>
-        <p>The Wallstry C++ exchange, terminal app, Python client and original documents were written by an original author who is not identified in the copy I received. That copy has no license. I have not published their source code and will not until the license is resolved. My work is the patches, tests, research package, bridge and this site.</p>
-        <p>FTXUI (MIT, Arthur Sonzogni) is used by the terminal app and is not bundled here. This site bundles React (MIT, Meta Platforms); see <a href="/THIRD_PARTY_NOTICES.txt">third-party notices</a>. It is not affiliated with the original Wallstry author.</p>
+      <section className="card"><h2>Limitations</h2>
+        <div className="cols2 plain">
+          <div><h3>Research</h3><ul>
+            <li><strong>No demonstrated predictive skill.</strong> Classification quality was indistinguishable from chance; no significance test; no multiple-testing correction.</li>
+            <li><strong>Survivorship bias.</strong> The five stocks are today’s mega-cap winners, which flatters buy-and-hold.</li>
+            <li><strong>One path, one vendor.</strong> Fills at the next open with fixed slippage; no market impact, taxes or cash yield.</li>
+            <li><strong>No curves.</strong> Equity and drawdown series are not published; see Research.</li></ul></div>
+          <div><h3>Exchange</h3><ul>
+            <li><strong>No market-order price protection</strong> in the engine, so a market buy can fill above the cash estimate. Inherited, unchanged.</li>
+            <li><strong>Sells are not collateral-checked</strong> (shorts are uncollateralised). Inherited, unchanged.</li>
+            <li><strong>Journal records have no checksums</strong>, and sync is off by default.</li>
+            <li><strong>Bridge orders can miss.</strong> IOC orders at a 1% limit failed to fill about 1 time in 4 against the bots’ thin book. That is normal behaviour; the bridge reports the cancels.</li></ul></div>
+          <div><h3>This website</h3><ul>
+            <li><strong>Charts are synthetic.</strong> The Trading page uses seeded random walks; only the ticker names echo real symbols.</li>
+            <li><strong>The browser demo is not the C++ engine.</strong> It is a simplified matcher written in TypeScript.</li>
+            <li><strong>No live exchange is connected</strong> to this site.</li></ul></div>
+          <div><h3>Platform</h3><ul>
+            <li>Built and tested on macOS Apple Silicon only. Linux and x86 are untested.</li></ul></div>
+        </div>
+      </section>
+      <section className="card"><h2>Licensing and what is published</h2>
+        <div className="scroll" tabIndex={0} role="region" aria-label="Licensing table (scrollable)">
+          <table className="txt wide"><caption className="sr">Licensing by component</caption>
+            <thead><tr><th scope="col">Component</th><th scope="col">Status</th><th scope="col">Published here?</th></tr></thead>
+            <tbody>{LICENSES.map(([a, b, c]) => <tr key={a}><th scope="row">{a}</th><td>{b}</td><td className={c.startsWith("Yes") || c.startsWith("Bundled") ? "pub" : "nopub"}>{c}</td></tr>)}</tbody></table>
+        </div>
+        <p className="small">This is a factual summary, not legal advice.</p>
+      </section>
+      <section className="card callout-card"><h2>Attribution</h2>
+        <p>The Wallstry C++ exchange, terminal app, Python client and original documents were written by whynotramaa (github.com/whynotramaa/wallstry, commit 0283b4c), who has not published a licence. I have not published their source code and will not until the author grants permission. My work is the patches, tests, research package, bridge and this site. This site is not affiliated with the original author. See <a href="/THIRD_PARTY_NOTICES.txt">third-party notices</a>.</p>
       </section>
     </div>
   );

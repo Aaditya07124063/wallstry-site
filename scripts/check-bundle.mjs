@@ -4,6 +4,8 @@ import { join } from "node:path";
 
 const bad = [/\/Users\/[a-z]/i, /\.journal|wallstry\.db/, /BEGIN [A-Z ]*PRIVATE KEY/, /AKIA[0-9A-Z]{16}/, /(api[_-]?key|secret|password|token)\s*[:=]\s*["'][^"']{8,}/i,
   /\bsnapshots?\/\d{8}_/, /heythereclaude/, /sourceMappingURL/, /adj_close/i, /recorded-run|SIMULATED EXCHANGE - PAPER/];
+// Derived research metrics stay local until provider terms are cleared; set ALLOW_RESEARCH_METRICS=1 only for a local preview.
+if (!process.env.ALLOW_RESEARCH_METRICS) bad.push(/8a05979d3a73|final_test_ledger|"?total_return"?\s*:|\bAUC\b[^.]{0,40}\d\.\d{2}|Sharpe/);
 const files = (d) => readdirSync(d).flatMap((f) => (statSync(join(d, f)).isDirectory() ? files(join(d, f)) : [join(d, f)]));
 let fail = 0;
 for (const f of files("dist")) {

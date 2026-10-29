@@ -82,3 +82,47 @@ export function submit(acct: Account, o: Order, b: Book, tick: number, marks: Re
 }
 
 export const equity = (a: Account, marks: Record<Sym, number>) => a.cash + SYMBOLS.reduce((s, k) => s + (a.pos[k] ?? 0) * marks[k], 0);
+
+export type Candle = { o: number; h: number; l: number; c: number; v: number };
+const BASE_VOL: Record<Sym, number> = { AAPL: 55e6, MSFT: 22e6, NVDA: 90e6, TSLA: 80e6, AMZN: 45e6 };
+/** Synthetic OHLCV derived from the synthetic closes: open = prior close, wicks and volume from a seeded RNG. */
+export function candles(sym: Sym, closes = series(sym)): Candle[] {
+  const r = rng(hash(sym) ^ 0x9e3779b9);
+  const daily = START[sym][1] / Math.sqrt(252);
+  return closes.map((c, i) => {
+    const o = i ? closes[i - 1] : c;
+    const wick = () => 1 + Math.abs(normal(r)) * daily * 0.5;
+    const h = +(Math.max(o, c) * wick()).toFixed(2), l = +(Math.min(o, c) / wick()).toFixed(2);
+    const move = Math.abs(c / o - 1) / daily; // bigger moves trade more
+    return { o, h, l, c, v: Math.round(BASE_VOL[sym] * (0.6 + 0.5 * move) * Math.exp(0.25 * normal(r))) };
+  });
+}
+
+/** Average-cost long-only position book from the fill list: shares, avg cost, realized P&L per symbol. */
+export function holdings(a: Account) {
+  const h: Partial<Record<Sym, { qty: number; cost: number; realized: number }>> = {};
+  for (const f of a.fills) {
+    const p = (h[f.sym] ??= { qty: 0, cost: 0, realized: 0 });
+    if (f.side === "buy") { p.cost += f.qty * f.price; p.qty += f.qty; }
+    else { const avg = p.cost / p.qty; p.realized += f.qty * (f.price - avg); p.cost -= f.qty * avg; p.qty -= f.qty; }
+  }
+  return h;
+}
+
+export type Status = "Filled" | "Partially filled" | "Cancelled" | "Rejected";
+export type OrderRec = { id: number; tick: number; order: Order; status: Status; filled: number; avg: number; note: string };
+/** submit() plus a blotter record. Limit orders are IOC, so they never rest: unfilled quantity is cancelled. */
+export function place(acct: Account, o: Order, b: Book, tick: number, marks: Record<Sym, number>, id: number): { acct: Account; rec: OrderRec } {
+  const r = submit(acct, o, b, tick, marks);
+  const mine = r.acct.fills.slice(acct.fills.length);
+  const avg = r.filled ? mine.reduce((s, f) => s + f.qty * f.price, 0) / r.filled : 0;
+  const base = { id, tick, order: o, filled: r.filled, avg };
+  if (r.error) return { acct, rec: { ...base, status: "Rejected", note: r.error } };
+  if (r.filled === o.qty) return { acct: r.acct, rec: { ...base, status: "Filled", note: `${mine.length} fill${mine.length > 1 ? "s" : ""}` } };
+  if (r.filled) return { acct: r.acct, rec: { ...base, status: "Partially filled", note: `${o.qty - r.filled} unfilled shares cancelled (IOC)` } };
+  return { acct, rec: { ...base, status: "Cancelled", note: o.type === "limit" ? "Limit did not cross the book; cancelled (IOC)" : "No liquidity or cash for the first level; cancelled" } };
+}
+
+/** Cash available for new buys: bounded by cash and by remaining gross-exposure headroom. */
+export const buyingPower = (a: Account, marks: Record<Sym, number>) =>
+  Math.max(0, Math.min(a.cash, LIMITS.maxGross - SYMBOLS.reduce((s, k) => s + (a.pos[k] ?? 0) * marks[k], 0)));
