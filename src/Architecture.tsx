@@ -2,9 +2,15 @@ type Origin = "up" | "mod" | "mine";
 const ORIGIN: Record<Origin, string> = { up: "Upstream, unchanged", mod: "Upstream, with my changes", mine: "Written by me" };
 type N = { x: number; y: number; t: string; s?: string; o: Origin; w?: number };
 
-function Diagram({ label, vb, nodes, edges, extra }: { label: string; vb: [number, number]; nodes: N[]; edges: string[]; extra?: React.ReactNode }) {
+function Diagram({ label, vb, nodes, edges, extra, flow }: { label: string; vb: [number, number]; nodes: N[]; edges: string[]; extra?: React.ReactNode; flow?: string[] }) {
+  const steps = flow ? flow.map((t) => nodes.find((n) => n.t === t)!) : nodes;
   return (
-    <div className="scroll" tabIndex={0} role="region" aria-label={`${label} (scrollable)`}>
+    <>
+    <div className="flowlist">
+      <p className="small">{label}</p>
+      <ol>{steps.map((n) => <li key={n.t} className={n.o}><b>{n.t}</b>{n.s && <span>{n.s}</span>}<Tag o={n.o} /></li>)}</ol>
+    </div>
+    <div className="scroll diagram" tabIndex={0} role="region" aria-label={`${label} (scrollable)`}>
       <svg viewBox={`0 0 ${vb[0]} ${vb[1]}`} role="img" aria-label={label} className="arch" style={{ minWidth: vb[0] * 0.92 }}>
         <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" className="head" /></marker></defs>
         {edges.map((d, i) => <path key={i} d={d} className="edge" fill="none" markerEnd="url(#ah)" />)}
@@ -18,6 +24,7 @@ function Diagram({ label, vb, nodes, edges, extra }: { label: string; vb: [numbe
         {extra}
       </svg>
     </div>
+    </>
   );
 }
 // Buttons, not #anchors: routing is hash-based, so an anchor would navigate away.
@@ -65,7 +72,7 @@ export function Architecture() {
 
       <section className="card" aria-labelledby="h-pipe">
         <h2 id="h-pipe">Exchange pipeline</h2>
-        <Diagram label="Exchange pipeline. Clients connect over binary TCP to the gateway. Commands flow through risk and the sequencer, which writes the journal, into the matching engine. Engine output goes to the publisher, which feeds client sessions, and through a history thread into SQLite." vb={[1110, 430]} nodes={PIPE} edges={PIPE_EDGES}
+        <Diagram flow={["Terminal app", "Bot fleet", "Python client", "Gateway", "Risk", "Sequencer", "Journal file", "Matching engine", "Publisher", "Client sessions", "History thread", "SQLite (WAL)"]} label="Exchange pipeline. Clients connect over binary TCP to the gateway. Commands flow through risk and the sequencer, which writes the journal, into the matching engine. Engine output goes to the publisher, which feeds client sessions, and through a history thread into SQLite." vb={[1110, 430]} nodes={PIPE} edges={PIPE_EDGES}
           extra={<><text x={365} y={102} className="lbl" textAnchor="middle">SPSC ring</text><text x={600} y={218} className="lbl">journal append</text></>} />
         <p className="small">Every stage runs on its own thread, linked by single-producer single-consumer ring buffers; the engine never reads a clock or touches the network, and allocates nothing after startup. Worker threads use an adaptive idle mode (my change); the original busy-spin remains available with <code>--idle busy</code>.</p>
       </section>

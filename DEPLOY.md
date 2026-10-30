@@ -35,4 +35,8 @@ Cloudflare Pages serves static files only and cannot run the persistent native C
 ## Research metrics are local-only (release gate)
 `src/research-data.local.ts` and `src/Research.local.tsx` are gitignored. A clean checkout builds the "figures withheld" Research page.
 `npm run check:bundle` fails if derived metrics are in `dist/` (override for local preview only: `ALLOW_RESEARCH_METRICS=1`).
-End-to-end tests: `npm run e2e` (needs Google Chrome).
+End-to-end tests: `npm run e2e` runs a `chromium` project (installed Google Chrome) and a `webkit` project (needs `npx playwright install webkit`; use `--project=chromium` or `--project=webkit` to run one).
+
+Verification limitations of the 2026-10-30 release check:
+- Chromium E2E (49 tests) ran on Google Chrome 156 with Playwright 1.56.1 and passed.
+- The pinned WebKit (rev 2215) download stalled and was **not tested**. WebKit was run only on a locally available fallback build (webkit-2370, reports 26.0) and passed 49/49, but with a temporary substitution: `@axe-core/playwright` timed out on that build, so the axe-core rules were injected directly instead (same wcag2a/2aa/21aa rule set, same axe-core). The committed spec still uses `@axe-core/playwright`; it has not run on WebKit.

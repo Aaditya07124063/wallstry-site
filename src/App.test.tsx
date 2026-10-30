@@ -123,3 +123,24 @@ test("public research page withholds figures and still states the conclusion", (
   expect(screen.getByText(/No predictive skill was demonstrated/)).toBeInTheDocument();
   expect(document.body.textContent).not.toMatch(/\d+\.\d+%/);
 });
+
+test("menu button toggles the navigation and Escape closes it", async () => {
+  location.hash = "home";
+  const user = userEvent.setup();
+  render(<App />);
+  const button = screen.getByRole("button", { name: /Menu/ });
+  expect(button).toHaveAttribute("aria-expanded", "false");
+  await user.click(button);
+  expect(button).toHaveAttribute("aria-expanded", "true");
+  expect(screen.getByRole("navigation", { name: "Main" })).toHaveClass("open");
+  await user.keyboard("{Escape}");
+  expect(button).toHaveAttribute("aria-expanded", "false");
+});
+
+test("text table cells carry their column header for the phone card layout", () => {
+  location.hash = "engineering";
+  render(<App />);
+  const cells = document.querySelectorAll("table.txt td[data-label]");
+  expect(cells.length).toBeGreaterThan(0);
+  expect(document.querySelectorAll("table.cards td[data-label]").length).toBeGreaterThan(0);
+});

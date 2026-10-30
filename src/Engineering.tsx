@@ -35,7 +35,7 @@ export function Engineering() {
       <section className="card" aria-labelledby="h-idle">
         <h2 id="h-idle">Idle CPU change, before and after</h2>
         <p className="small">Apple M1, macOS, Apple clang, C++23. Linux not tested.</p>
-        <div className="scroll" tabIndex={0} role="region" aria-label="Idle mode comparison (scrollable)"><table><caption className="sr">Busy versus adaptive idle mode</caption>
+        <div className="scroll" tabIndex={0} role="region" aria-label="Idle mode comparison (scrollable)"><table className="cards"><caption className="sr">Busy versus adaptive idle mode</caption>
           <thead><tr><th scope="col">Metric</th><th scope="col">Busy (original)</th><th scope="col">Adaptive (default)</th></tr></thead>
           <tbody>
             <tr><th scope="row">Idle CPU, 10 s</th><td>495%</td><td>19.9%, 20.5%</td></tr>
